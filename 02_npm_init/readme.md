@@ -18,3 +18,20 @@
 - Type `nano .gitignore` and press Enter.
 - to save: Press `CTRL + O`, then Enter.
 - to exit: Press `CTRL + X`.
+
+## Add the watch flag to the package.json
+
+- Open the `package.json` file.
+- Add the following line to the `scripts` section:
+
+  ```json
+  "dev": "node --watch server.js"
+  ```
+
+To run the script now you can use the command:
+
+```bash
+npm run dev
+```
+
+To stop the server you can use `CTRL + C` in the terminal.
