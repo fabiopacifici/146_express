@@ -1,0 +1,20 @@
+{
+  "name": "02_npm_init",
+  "version": "1.0.",
+  "main": "server.js",
+  "type": "module",
+ 
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "A simple Node.js project with npm initialization",
+  "dependencies": {
+    "axios": "^1.10.0",
+    "chalk": "^5.4.1",
+    "dotenv": "^16.5.0"
+  }
+}
