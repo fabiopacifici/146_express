@@ -1,54 +1,110 @@
 const express = require('express')
 const app = express()
-const PORT = 3030
-
+const PORT = process.env.PORT
+const PizzaRouter = require('./routes/pizzas')
+const UserRouter = require('./routes/users')
 
 app.use(express.static('public'))
-
+app.use(express.json())
 
 app.listen(PORT, ()=>{
   console.log(`Server listening on http://localhost:${PORT}`);
 })
 
 
+
+/* 🚋 routes*/
 // Define the pizza-express routes
-
 app.get('/', (req, res)=>{
-
   res.send('Welcome to pizza express server! The server is running')
-
 })
 
+/* 👉 Endpoint for the pizza resource */
+// Use the PizzaRouter
+app.use('/api/pizzas', PizzaRouter)
 
-// pizzas index
+/* 👉 Endpoint to manage `User` */
+// use UserRouter
+app.use('/api/users', UserRouter)
+
+
+// 👇 Basic Routing system
+
+// api/pizzas
+
+
+/* // Index (read)
 app.get('/api/pizzas', (req, res)=>{
+  res.json(pizzas)
+})
 
-  const menu = [
-    {
-      name: "Margherita",
-      image: `http://localhost:${PORT}/imgs/margherita.webp`,
-      ingredients: ["pomodoro", "mozzarella"],
-    }, {
-      name: "Marinara",
-      image: `http://localhost:${PORT}/imgs/marinara.jpeg`,
-      ingredients: ["pomodoro", "aglio", "origano"],
-    }, {
-      name: "Diavola",
-      image: `http://localhost:${PORT}/imgs/diavola.jpeg`,
-      ingredients: ["pomodoro", "mozzarella", "salame piccante"],
-    }, {
-      name: "Bufalina",
-      image: `http://localhost:${PORT}/imgs/bufalina.jpeg`,
-      ingredients: ["pomodoro", "mozzarella di bufala"],
-    }, {
-      name: "4 formaggi",
-      image: `http://localhost:${PORT}/imgs/4_formaggi.jpeg`,
-      ingredients: ["pomodoro", "mozzarella", "gorgonzola", "parmigiano", "ricotta"],
-    }
-  ]
+//Show (read) 
+app.get('/api/pizzas/:id', (req, res)=>{
 
+  // The dynamic segment of the URI is passed inside the params object of the `req` object
+  console.log(req.params);
+  // read the value using the id key if the segment was called like that `:id`
+  const id = req.params.id
+  //console.log(req.query);
 
-
-  res.json(menu)
+  // return a response
+  res.send(`You requested the pizza with id: ${id} `)
 
 })
+
+//Store (create)
+app.post('/api/pizzas', (req, res)=>{
+
+  res.send('Save a new pizza into the db')
+
+})
+
+// Update (update)
+app.put('/api/pizzas/:id', (req, res)=>{
+
+  const id = req.params.id
+
+  res.send(`You want to update pizza with id: ${id}`)
+})
+
+
+// Modify (update)
+app.patch('/api/pizzas/:id', (req, res) => {
+
+  const id = req.params.id
+
+  res.send(`You want to modify pizza with id: ${id}`)
+})
+
+//destroy (delete)
+app.delete('/api/pizzas/:id', (req, res)=>{
+  
+  const id = req.params.id
+  res.send(`You want to delete pizza with id: ${id}`)
+})
+*/
+
+
+
+
+
+
+
+
+
+
+/* 👉 Endpoint to manage `Product` */
+// index
+app.get('/api/products', (req, res)=>{
+  res.send('list products')
+})
+
+// show
+app.get('/api/products/:id', (req, res) => {
+  res.send('show the product')
+
+})
+
+// etc etc etc..
+
+/* 👉 Endpoint to manage `Article` */
