@@ -1,7 +1,19 @@
 const express = require('express')
 const router = express.Router()
 const pizzaController = require('../controllers/pizzaController')
+const checkApiToken = require('../middlewares/checkApiToken')
 
+
+
+/* Anon Middleware at router level */
+/* router.use((req, res, next)=>{
+  console.log('I am a router level middleware');
+  
+  next()
+}) */
+
+
+//router.use(logMessage)
 
 // ✅ Index (read)
 router.get('/', pizzaController.index )
@@ -10,17 +22,17 @@ router.get('/', pizzaController.index )
 router.get('/:id', pizzaController.show)
 
 /* ✅ Store (create) */
-router.post('/', pizzaController.store)
+router.post('/', checkApiToken, pizzaController.store)
 
 //✅  Update (update)
-router.put('/:id', pizzaController.update)
+router.put('/:id', checkApiToken, pizzaController.update)
 
 
 // Modify (update)
-router.patch('/:id', pizzaController.modify)
+router.patch('/:id', checkApiToken,  pizzaController.modify)
 
 /* ✅ destroy (delete) */
-router.delete('/:id', pizzaController.destroy)
+router.delete('/:id', checkApiToken, pizzaController.destroy)
 
 
 

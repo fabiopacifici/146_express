@@ -3,7 +3,9 @@ const app = express()
 const PORT = process.env.PORT
 const PizzaRouter = require('./routes/pizzas')
 const UserRouter = require('./routes/users')
-
+const logMessage = require('./middlewares/logMessage')
+const handleServerError = require('./middlewares/handleServerError')
+const handleNotFound = require('./middlewares/handleNotFound')
 app.use(express.static('public'))
 app.use(express.json())
 
@@ -12,12 +14,45 @@ app.listen(PORT, ()=>{
 })
 
 
+/* Middleware (global)*/
+//1. Middlewre option 1 (Function declaration)
+/* function logMessage(req, res, next){
+  console.log('I am a middleware');
+  res.send('sent by the middleware')
+  //next()
+} */
+
+// Global middleware on a specific path
+//app.use('/api/', logMessage)
+
+// 2. Middleware (global)
+// anon function
+/* app.use((req, res, next)=>{
+  console.log('I am a middleware');
+
+  next()
+}) */
+
+//app.use(logMessage)
+//app.use('/api/users', logMessage)
 
 /* 🚋 routes*/
 // Define the pizza-express routes
 app.get('/', (req, res)=>{
+  console.log('I am the route that handles the request');
+  //app.daje()
   res.send('Welcome to pizza express server! The server is running')
 })
+
+/* Middleware example at route level 
+app.get('/', logMessage, (req, res)=>{
+  console.log('I am the route that handles the request');
+  
+  res.send('Welcome to pizza express server! The server is running')
+})
+
+*/
+
 
 /* 👉 Endpoint for the pizza resource */
 // Use the PizzaRouter
@@ -108,3 +143,5 @@ app.get('/api/products/:id', (req, res) => {
 // etc etc etc..
 
 /* 👉 Endpoint to manage `Article` */
+app.use(handleServerError);
+app.use(handleNotFound)

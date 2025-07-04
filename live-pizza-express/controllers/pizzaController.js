@@ -51,6 +51,8 @@ const show = (req, res) => {
 
 const store = (req, res) => {
 
+  //console.log(req.fabio);
+  
   console.log(req.body, 'This is the req.body');
 
   // create an id for the current pizza object
