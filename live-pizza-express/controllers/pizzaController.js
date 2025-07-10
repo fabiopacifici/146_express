@@ -1,22 +1,18 @@
 const pizzas = require('../data/pizzas')
-
+const connection = require('../db/connection')
 
 const index = (req, res) => {
-  console.log(req.query);
 
-  //Inizialmente, il menu filtrato corrisponde a quello originale
-  let filteredMenu = pizzas;
+  const sql = 'SELECT * FROM pizzas'
 
-  // Se la richiesta contiene un filtro, allora filtriamo il menu
-  if (req.query.ingredient) {
-    filteredMenu = pizzas.filter(
-      pizza => pizza.ingredients.includes(req.query.ingredient)
-    );
-  }
+  connection.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: true, message: err.message })
+    console.log(results);
 
-  // restituiamo la variabile filteredMenu
-  // potrebbe essere stata filtrata o contenere il menu originale
-  res.json(filteredMenu);
+    res.json(results)
+
+  })
+
 }
 
 
@@ -25,59 +21,65 @@ const show = (req, res) => {
   // The dynamic segment of the URI is passed inside the params object of the `req` object
   console.log(req.params);
   console.log(typeof req.params.id);
-
   // read the value using the id key if the segment was called like that `:id`
+
   const id = parseInt(req.params.id)
+
+  const sql = 'SELECT * FROM 146_db_pizzas.pizzas WHERE id = ? ;'
+  console.log(sql);
+  //res.send('test')
+
+  connection.query(sql, [id], (err, results) => {
+    if (err) return res.status(500).json({ error: true, message: err.message })
+
+    console.log(results);
+    if (!results.length > 0) {
+      return res.status(404).json({
+        error: true,
+        message: 'Not Found'
+      })
+    }
+    return res.json(results[0])
+
+  })
+  //res.send('test')
+
   //console.log(req.query);
 
-  const pizza = pizzas.find(pizza => pizza.id === id)
+  //const pizza = pizzas.find(pizza => pizza.id === id)
 
 
   /* Chain the status code before the json method to return the correct code */
 
-  if (!pizza) {
-    return res.status(404).json({
-      error: true,
-      message: 'Not Found'
-    })
-  }
+  /*   if (!pizza) {
+      return res.status(404).json({
+        error: true,
+        message: 'Not Found'
+      })
+    } */
 
   // return a response
   //res.send(`You requested the pizza with id: ${id} `)
 
-  res.json(pizza)
+  //res.json(pizza)
 }
 
 
 const store = (req, res) => {
 
   //console.log(req.fabio);
-  
+
+
   console.log(req.body, 'This is the req.body');
+  const { name, image } = req.body
 
-  // create an id for the current pizza object
-  const pizzaId = pizzas[pizzas.length - 1].id + 1
-  console.log(pizzaId);
+  const sql = 'INSERT INTO pizzas (name, image) VALUES (?, ?);'
 
-  // construct the object literal taking the data from the req.body
-  const newPizzaObj = {
-    id: pizzaId,
-    name: req.body.name,
-    image: req.body.image,
-    ingredients: req.body.ingredients
-  }
-
-  console.log(newPizzaObj);
-
-
-  // push into the pizzas array
-  pizzas.push(newPizzaObj)
-
-  console.log(pizzas);
-
-  // provide a response 201
-  res.status(201).json(newPizzaObj)
-
+  connection.query(sql, [name, image], (err, results) => {
+    if (err) return res.status(500).json({ error: true, message: err.message })
+    console.log(results);
+    res.status(201).json({id: results.insertId})
+  })
 
 }
 
@@ -87,13 +89,53 @@ const update = (req, res) => {
 
   // read the value using the id key if the segment was called like that `:id`
   const id = parseInt(req.params.id)
+  const {name, image} = req.body
+
+
+  const sql = "UPDATE pizzas SET name = ?, image = ? WHERE id = ?;"
+
+  connection.query(sql, [name, image, id], (err, results)=>{
+
+    if (err) return res.status(500).json({ error: true, message: err.message })
+    console.log(results);
+    if (results.affectedRows === 0) {
+      return res.status(404).json({
+        error: true,
+        message: 'Not Found'
+      })
+    }
+
+    const sqlSinglePizza = 'SELECT * FROM pizzas WHERE id = ? ;'
+    connection.query(sqlSinglePizza, [id], (err, results) => {
+      if (err) return res.status(500).json({ error: true, message: err.message })
+
+      console.log(results);
+      if (!results.length > 0) {
+        return res.status(404).json({
+          error: true,
+          message: 'Not Found'
+        })
+      }
+      return res.json(results[0])
+
+    })
+
+
+
+    //res.json({success: true, message: "Pizza updated successfull"})
+
+  })
+
+
+
+
   //console.log(req.query);
 
-  const pizza = pizzas.find(pizza => pizza.id === id)
+/*   const pizza = pizzas.find(pizza => pizza.id === id) */
 
 
   /* Chain the status code before the json method to return the correct code */
-
+/* 
   if (!pizza) {
     return res.status(404).json({
       error: true,
@@ -106,7 +148,7 @@ const update = (req, res) => {
   pizza.ingredients = req.body.ingredients
 
   console.log(pizzas);
-  res.json(pizza)
+  res.json(pizza) */
 
 }
 
@@ -143,38 +185,53 @@ const destroy = (req, res) => {
   /*   const id = req.params.id
     res.send(`You want to delete pizza with id: ${id}`) */
 
-
-
   // The dynamic segment of the URI is passed inside the params object of the `req` object
   console.log(req.params);
-  console.log(typeof req.params.id);
+  //console.log(typeof req.params.id);
 
   // read the value using the id key if the segment was called like that `:id`
   const id = parseInt(req.params.id)
+
+  const sql = "DELETE FROM pizzas WHERE id = ?"
+
+  connection.query(sql, [id], (err, results) => {
+    if (err) return res.status(500).json({ error: true, message: err.message })
+    console.log(results);
+    if (results.affectedRows === 0) {
+      return res.status(404).json({
+        error: true,
+        message: 'Not Found'
+      })
+    }
+
+    res.sendStatus(204)
+
+  })
+
+
   //console.log(req.query);
 
-  const pizza = pizzas.find(pizza => pizza.id === id)
+  /*   const pizza = pizzas.find(pizza => pizza.id === id) */
 
 
   /* Chain the status code before the json method to return the correct code */
 
-  if (!pizza) {
-    return res.status(404).json({
-      error: true,
-      message: 'Not Found'
-    })
-  }
+  /*   if (!pizza) {
+      return res.status(404).json({
+        error: true,
+        message: 'Not Found'
+      })
+    } */
 
 
 
   // Rimuoviamo la pizza dal menu
-  pizzas.splice(pizzas.indexOf(pizza), 1);
-
-  console.log(pizzas);
+  /*  pizzas.splice(pizzas.indexOf(pizza), 1);
+ 
+   console.log(pizzas); */
 
 
   // Restituiamo lo status corretto
-  res.sendStatus(204)
 
 
 }
